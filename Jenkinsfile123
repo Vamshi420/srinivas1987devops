@@ -9,7 +9,7 @@ pipeline {
         SONARQUBE_ENV = 'sonarqube'      // Must match Jenkins SonarQube config name
         NEXUS_URL = 'http://3.110.158.41:8081/repository/maven-releases/'
         NEXUS_USER = credentials('nexus-credentials') // Jenkins credentials ID
-        TOMCAT_URL = 'http://13.233.119.209:8080/manager/text/deploy?path=/myweb&update=true'
+        TOMCAT_URL = 'http:/65.2.63.99:8080/manager/text/deploy?path=/myweb&update=true'
         TOMCAT_CRED = credentials('tomcat-credentials') // Jenkins credentials ID
     }
 
