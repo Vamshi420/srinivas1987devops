@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'maven' // Name from Jenkins Global Tool Configuration
+    }
+
+    environment {
+        SONARQUBE_ENV = 'sonarqube'      // Must match Jenkins SonarQube config name
+        NEXUS_URL = 'http://3.110.158.41:8081/repository/maven-releases/'
+        NEXUS_USER = credentials('nexus-credentials') // Jenkins credentials ID
+        TOMCAT_URL = 'http://13.233.119.209:8080/manager/text/deploy?path=/myweb&update=true'
+        TOMCAT_CRED = credentials('tomcat-credentials') // Jenkins credentials ID
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/Vamshi420/maven-web-app.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Upload to Nexus') {
+            steps {
+                sh '''
+                    mvn deploy -DaltDeploymentRepository=nexus::default::${NEXUS_URL} \
+                        -Dnexus.username=${NEXUS_USER_USR} -Dnexus.password=${NEXUS_USER_PSW}
+                '''
+            }
+        }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                sh '''
+                    curl -u ${TOMCAT_CRED_USR}:${TOMCAT_CRED_PSW} \
+                    --upload-file target/*.war \
+                    "${TOMCAT_URL}"
+                '''
+            }
+        }
+    }
+}
