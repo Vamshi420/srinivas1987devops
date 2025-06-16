@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/Vamshi420/srinivas1987devops.git', branch: 'master'
+                git url: 'https://github.com/Vamshi420/srinivas1987devops.git', branch: 'dev1'
             }
         }
 
